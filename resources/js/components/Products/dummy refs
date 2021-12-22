@@ -1,0 +1,284 @@
+<input type="file" @change="previewFiles" multiple>
+
+methods: {
+   previewFiles(event) {
+      console.log(event.target.files);
+   }
+}
+
+
+<!--
+@if(Session::has('cart'))
+<div class="row">
+    <div class="col-sm-12 offset-sm-3">
+     <h1 class="display-4 text-primary text-underline">Selected products</h1>
+    </div>
+</div>
+<div class="row mt-3">
+  <div class="col-sm-6 col-md-6 offset-sm-3">
+  <ul class="list-group">
+  <table class="table table-hover table-dark">
+  <thead>
+    <tr>
+      <th scope="col">Number of Products</th>
+      <th scope="col">Product name</th>
+      <th scope="col">Product Total Price</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+  @foreach($products as $product)
+    <tr>
+      <th scope="row"><span class="badge">{{$product['qty']}}</span></th>
+      <td><strong> {{$product['item']['title']}} </strong></td>
+      <td><span class="label bg-success mr-1"> $ {{$product['price']}} </span></td>
+      <td>
+      <button type="button" class="btn-group btn-primary btn-xs dropdown-toogle mr-2" data-toggle="dropdown">
+      Action <span class="caret"></span>
+      <ul class="dropdown-menu">
+       <li><a href=" {{route('reduce',['id'=>$product['item']['id']])}}">Reduce by 1</a></li>
+       <li><a href=" {{route('remove',['id'=>$product['item']['id']])}}">Reduce by All</a></li>
+      </ul>
+     </button>
+      </td>
+    </tr>
+    @endforeach
+  </tbody>
+</table>
+  </ul>
+  </div>
+</div>
+<div class="row">
+ <div class="col-sm-6 col-md-6 offset-sm-3">
+  <strong> Total: {{$totalPrice}} </strong>
+ </div>
+</div>
+<hr>
+<div class="row">
+ <div class="col-sm-6 col-md-6 offset-sm-3">
+  <a href="{{route('checkout')}}" class="btn btn-success"> Checkout </a>
+ </div>
+</div>
+@else
+<div class="row">
+ <div class="col-sm-6 col-md-6 offset-sm-3">
+   <p class="display-1">No Items In The Cart</p>
+ </div>
+</div>
+@endif 
+-->
+
+<div class="row mt-2">
+ <div class="col-sm-10 offset-sm-1">
+ <div class="card text-center">
+  <div class="card-header text-center">
+    My Profile
+  </div>
+  <h1 class="card-title text-center"> My Orders </h1>
+  @foreach($orders as $order)
+  <div class="card-body">
+   <ul class="list-group">
+     @foreach($order->cart->items as $item)
+     <li class="list-group-item">
+       <span class="badge"> {{$item['price']}} | {{$item['qty']}} </span> 
+       {{$item['item']}} Units
+     </li>
+     @endforeach
+   </ul>
+  </div>
+  <div class="card-footer text-muted">
+    <strong>Total Price: ${{$order->cart->totalPrice}}</strong>
+  </div>
+  @endforeach
+</div>
+ </div>
+</div>
+
+//stripe
+
+<div class="container-fluid">
+<div class="row Theme mt-1">
+  <div class="col-sm-12 offset-sm-3">
+  <h3 class="panel-title text-primary" >Payment Details</h3>
+  </div>
+  <div class="col-md-5 col-sm-5 offset-sm-3 ">
+   <div class="panel panel-default credit-card-box">
+     <div class="panel-heading display-table" >
+         <div class="row display-tr" >
+             <div class="display-td" >                            
+                 <img class="img-responsive pull-right" src="http://i76.imgup.net/accepted_c22e0.png">
+             </div>
+         </div>                    
+     </div>
+     <div class="panel-body">
+         @if (Session::has('success'))
+             <div class="alert alert-success text-center">
+                 <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+                 <p>{{ Session::get('success') }}</p>
+             </div>
+         @endif 
+         @if (Session::has('error'))
+             <div id="charge-error" class="alert alert-success text-center">
+                 <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+                 <p>{{ Session::get('error') }}</p>
+             </div>
+         @endif 
+         <form role="form" action="{{route('postcheckout')}}" method="post" id="checkout-form" class="require-validation"
+                                          data-cc-on-file="false"
+                                         data-stripe-publishable-key="{{ env('STRIPE_KEY') }}"
+                                         id="payment-form">
+             @csrf
+             <div class='form-group'>
+              <label class='control-label text-white'>Name</label> 
+              <input name="name" class='form-control'  type='text'>
+             </div>
+             <div class='form-group'>
+              <label class='control-label text-white'>Address</label> 
+              <input name="address" class='form-control'  type='text'>
+             </div> 
+             <div class='form-group required'>
+              <label class='control-label text-white'>Name on Card</label> 
+              <input class='form-control card_name'  type='text'>
+             </div> 
+             <div class='form-group col-xs-4 Theme card required'>
+               <label class='control-label text-white'>Card Number</label> 
+               <input autocomplete='off' class='form-control card-number' size='20' type='text'>
+             </div> 
+             <div class='form-row row'>
+                 <div class='col-xs-12 col-md-4 form-group cvc required'>
+                     <label class='control-label text-white'>CVC</label> 
+                     <input autocomplete='off' class='form-control card-cvc' placeholder='ex. 311' size='4' type='text'>
+                 </div>
+                 <div class='col-xs-12 col-md-4 form-group expiration required'>
+                     <label class='control-label text-white'>Expiration Month</label> 
+                     <input class='form-control card-expiry-month' placeholder='MM' size='2' type='text'>
+                 </div>
+                 <div class='col-xs-12 col-md-4 form-group expiration required'>
+                     <label class='control-label text-white'>Expiration Year</label>
+                     <input class='form-control card-expiry-year' placeholder='YYYY' size='4' type='text'>
+                 </div>
+             </div>
+             <div class='form-row row'>
+                 <div class='col-md-12 error form-group hide'>
+                  <div class='alert-danger alert'>
+                     Please correct the errors and try again.
+                  </div>
+                 </div>
+             </div>
+             <div class="row">
+                 <div class="col-xs-12 offset-sm-3">
+                     <button  class="btn btn-primary btn-lg btn-block" type="submit">Pay Now (${{$total}})</button>
+                 </div>
+             </div>
+               
+         </form>
+     </div>
+   </div>        
+  </div>
+ </div> 
+
+</div>
+
+<!DOCTYPE html>
+<html>
+<head>
+ <title>pay with stripe</title>
+     <!-- Styles -->
+ <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+ <link href="{{ asset('css/style.css') }}" rel="stylesheet" > 
+     <!-- Stripe Styles -->
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+ <link rel="stylesheet" href="{{ asset('css/stripe.css') }}">
+</head>
+<body>
+    <div id="app">
+     @include('partials.header')
+       <div class="container">
+        @yield('content')
+       </div> 
+       @include('partials.footer')            
+    </div>
+</body>
+    <!-- Stripe Scripts -->
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 
+    <!-- Scripts -->
+<script src="{{ asset('js/app.js') }}" defer></script>
+<script src="{{ asset('js/all.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/stripe.js') }}"></script>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+   <title>Bootstrap 101 Template</title>
+   <!-- Bootstrap -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+ <style>
+ .submit-button {
+ margin-top: 10px;
+}
+ </style>
+ </head>
+ <body>
+<div class="container">
+<div class='row'>
+<div class='col-md-4'></div>
+<div class='col-md-4'>
+<form class="form-horizontal" method="POST" id="payment-form" role="form" action="{{route('postcheckout')}}" >
+<div class='form-row'>
+<div class='col-xs-12 form-group card required'>
+<label class='control-label'>Card Number</label>
+<input autocomplete='off' class='form-control card-number' size='20' type='text' name="card_no">
+</div>
+</div>
+<div class='form-row'>
+<div class='col-xs-4 form-group cvc required'>
+<label class='control-label'>CVV</label>
+<input autocomplete='off' class='form-control card-cvc' placeholder='ex. 311' size='4' type='text' name="cvvNumber">
+</div>
+<div class='col-xs-4 form-group expiration required'>
+<label class='control-label'>Expiration</label>
+<input class='form-control card-expiry-month' placeholder='MM' size='4' type='text' name="ccExpiryMonth">
+</div>
+<div class='col-xs-4 form-group expiration required'>
+<label class='control-label'> </label>
+<input class='form-control card-expiry-year' placeholder='YYYY' size='4' type='text' name="ccExpiryYear">
+<input class='form-control card-expiry-year' placeholder='YYYY' size='4' type='hidden' name="amount" value="300">
+</div>
+</div>
+<div class='form-row'>
+<div class='col-md-12' style="margin-left:-10px;">
+<div class='form-control total btn btn-primary' >
+Total:
+<span class='amount'>$300</span>
+</div>
+</div>
+</div>
+<div class='form-row'>
+<div class='col-md-12 form-group'>
+<button class='form-control btn btn-success submit-button' type='submit'>Pay »</button>
+</div>
+</div>
+<div class='form-row'>
+<div class='col-md-12 error form-group hide'>
+<div class='alert-danger alert'>
+Please correct the errors and try again.
+</div>
+</div>
+</div>
+</form>
+</div>
+<div class='col-md-4'></div>
+</div>
+</div>
+</body>

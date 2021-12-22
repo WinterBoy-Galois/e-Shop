@@ -1,0 +1,93 @@
+<div class="ring">
+ Loading
+ <span></span>
+</div> 
+
+  .ring{
+     position: absolute; 
+     top: 5%;
+     left: 50%;
+     transform: translate(-50%,50%);
+     width: 150px;
+     height: 150px;
+     background: transparent;
+     border: 3px solid #3c3c3c;
+     border-radius: 50%;
+     text-align: center;
+     line-height: 150px;
+     font-family: sans-serif;
+     font-size: 20px;
+     color: #fff000;
+     letter-spacing: 4px;
+     text-transform: uppercase;
+     text-shadow: 0 0 10px #fff000;
+     box-shadow: 0 0 20px rgba(0,0,0,.5);
+
+
+  }
+  .ring::before{
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 3px solid transparent;
+      border-top: 3px solid #fff000;
+      border-right: 3px solid #fff000;
+      border-radius: 50%;
+      animation: animateCircle 2s linear infinite;
+  }
+  span{
+      display: block;
+      position: absolute;
+      top: calc(50% -2px);
+      left: 50%;
+      width: 50%;
+      height: 4px;
+      background: #fff000;
+      transform-origin: left;
+      animation: animate 2s linear infinite;
+  }
+  span::before{
+    content: '';
+    position: absolute;
+    width: 16px;
+    border-radius: 50%;
+    background: #fff000; 
+    top: -6px;
+    right: -8px;
+    box-shadow: 0 0 20px #fff000;
+  }
+
+          <div class="col-sm-11 ml-5">
+          <div class="card Theme">
+            <div id="carouselExampleCaptions" class="carousel ml-2 mr-2 slide" data-ride="carousel">
+              <ol class="carousel-indicators">
+                <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
+                <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
+                <li data-target="#carouselExampleCaptions" data-slide-to="2"></li>
+              </ol>
+              <div class="carousel-inner carousel-img-height">
+                @foreach ($otherproducts as $otherproduct)
+                <div class="carousel-item active">
+                  <a class="nav-link link-color" href=" {{route('product',['id'=>$otherproduct->id])}}"> <img class="d-block img-thumbnail img-fluid w-100" src="{{asset('Images/' . $otherproduct->imagePath)}}" alt="" srcset="">   </a>
+                </div>   
+                @endforeach
+              </div>
+              <div class="row justify-content-center mb-5">
+                <div class="col-sm-12 text-center">
+                  <h1 class="heading-color">{{$otherproduct->title}}</h1> 
+                </div>
+              </div>
+              <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="carousel-control-next" href="#carouselExampleCaptions" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
+            </div>
+           </div>
+        </div> 
